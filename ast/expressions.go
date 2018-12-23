@@ -387,7 +387,21 @@ type CompareSubqueryExpr struct {
 
 // Restore implements Node interface.
 func (n *CompareSubqueryExpr) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	if err := n.L.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore CompareSubqueryExpr.L")
+	}
+	ctx.WritePlain(" ")
+	if err := n.Op.Restore(ctx.In); err != nil {
+		return errors.Annotate(err, "An error occurred when restore CompareSubqueryExpr.Op")
+	}
+	ctx.WritePlain(" ")
+	if n.All {
+		ctx.WriteKeyWord("ALL ")
+	}
+	if err := n.R.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore CompareSubqueryExpr.R")
+	}
+	return nil
 }
 
 // Format the ExprNode into a Writer.

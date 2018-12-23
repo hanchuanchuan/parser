@@ -277,3 +277,13 @@ func (tc *testExpressionsSuite) TestPatternRegexpExprRestore(c *C) {
 	}
 	RunNodeRestoreTest(c, testCases, "select %s", extractNodeFunc)
 }
+
+func (tc *testExpressionsSuite) TestCompareSubqueryExprRestore(c *C) {
+	testCases := []NodeRestoreTestCase{
+		{"a > all (select id from t1)", "`a` > ALL (SELECT `id` FROM `t1`)"},
+	}
+	extractNodeFunc := func(node Node) Node {
+		return node.(*SelectStmt).Where.(*CompareSubqueryExpr)
+	}
+	RunNodeRestoreTest(c, testCases, "select * from t1 where %s", extractNodeFunc)
+}
